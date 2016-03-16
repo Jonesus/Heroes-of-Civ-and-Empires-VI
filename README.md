@@ -1,1 +1,3 @@
-# Heroes-of-Civ-and-Empires-VI
+# Heroes of Civ and Empires VI
+
+Ohjelmoinnin jatkokurssi Y2 -projektityö
