@@ -10,8 +10,8 @@ class Tile:
         self.y = y
         self.unit = None
         
-        self.pathable = LANDSCAPES[landscape[0]]
-        self.img      = LANDSCAPES[landscape[1]]
+        self.pathable = LANDSCAPES[landscape][0]
+        self.img      = LANDSCAPES[landscape][1]
         
         
         
