@@ -1,18 +1,13 @@
 import pygame
+from menu import Menu
 
 
-
-
-BLACK = (  0,   0,   0)
-WHITE = (255, 255, 255)
-BLUE =  (  0,   0, 255)
-GREEN = (  0, 255,   0)
-RED =   (255,   0,   0)
 
 
 def main():
     
     pygame.display.init()
+    pygame.init()
     
     displayWidth = 800
     displayHeight = 600
@@ -23,29 +18,43 @@ def main():
     pygame.display.set_caption("Heroes of Civ and Empires VI")
     FPS = 30
     
-    defaultFont = pygame.font.SysFont(None, 20)
+    
+    mainMenu = Menu(gameScreen)
     
     
     
-    def button(text, x, y, width, height, color, activeColor, action = None):
-        mousePos = pygame.mouse.get_pos()
-        clicked = pygame.mouse.get_pressed()
+    
+    
+    running = True
+    
+    while running:
         
-        if x+width > mousePos[0] > x and y+height > mousePos[1] > y:
-            pygame.draw.rect(gameScreen, activeColor,(x,y,width,height))
-            if clicked[0] == 1 and action != None:
-                action()
-            
-        else:
-            pygame.draw.rect(gameScreen, color,(x,y,width,height))
-
-        text = defaultFont.render(text, True, BLACK)
-        textRect = text.get_rect()
+        mainMenu.draw()
         
-        textRect.center = ( (x+(width/2)), (y+(height/2)) )
-        gameScreen.blit(text, textRect)
+        pygame.display.update()
+        gameClock.tick(FPS)
+        
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+main()
 
 
