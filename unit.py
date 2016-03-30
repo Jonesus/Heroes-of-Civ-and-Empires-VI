@@ -1,3 +1,6 @@
+import pygame
+
+
 UP    = ( 1 , 0)
 DOWN  = (-1 , 0)
 LEFT  = ( 0 ,-1)
@@ -51,6 +54,7 @@ class Unit:
         self.range = self.attributedict["RANGE"]
         self.moves = self.attributedict["MOVES"]
         
+        self.img = pygame.image.load( self.attributedict["IMAGE"] ).convert()
 
         
     def move(self, direction):

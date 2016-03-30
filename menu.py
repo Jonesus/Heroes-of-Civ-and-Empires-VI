@@ -38,13 +38,13 @@ class Button:
         if self.x+self.width > mousePos[0] > self.x and self.y+self.height > mousePos[1] > self.y:
             pygame.draw.rect(self.screen, self.activeColor,(self.x,self.y,self.width,self.height))
             if clicked[0] == 1 and self.action != None:
-                self.action()
+                return self.action()
             
         else:
             pygame.draw.rect(self.screen, self.color,(self.x,self.y,self.width,self.height))
 
         self.screen.blit(self.text, self.textRect)
-
+        return 0
 
 
 class Text:
@@ -70,10 +70,10 @@ class Menu:
         
         self.screen = screen
         
-        self.startButton = Button("Start",self.screen.get_width()/2-100, self.screen.get_height()/2-50, 200, 50, GREEN, LGREEN, self.screen)
-        self.quitButton = Button("Quit",self.screen.get_width()/2-100, self.screen.get_height()/2+50, 200, 50, RED, LRED, self.screen, action = quit)
+        self.startButton = Button("Start",self.screen.get_width()/2-100, self.screen.get_height()/2-50, 200, 50, GREEN, LGREEN, self.screen, action = self.startGame)
+        self.quitButton = Button("Quit",self.screen.get_width()/2-100, self.screen.get_height()/2+50, 200, 50, RED, LRED, self.screen, action = self.quitGame)
         
-        self.titleText = Text("Heroes of Civ and Empires VI", self.screen.get_width()/2, self.screen.get_height()/2-200, 40, self.screen, font = "Comic Sans MS")
+        self.titleText = Text("Heroes of Civ and Empires VI", self.screen.get_width()/2, self.screen.get_height()/2-200, 40, self.screen, BLUE,"Comic Sans MS")
         
         self.objects = [self.startButton, self.quitButton, self.titleText]
         
@@ -83,12 +83,20 @@ class Menu:
         
         self.screen.fill(WHITE)
         for thing in self.objects:
-            thing.draw()
+            ret = thing.draw()
+            if ret == 1:
+                return 1
+        
+        return 0
 
+    
+    
+    def startGame(self):
+        return 1
 
-
-
-
+    
+    def quitGame(self):
+        quit()
 
 
 
