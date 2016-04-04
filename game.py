@@ -11,7 +11,7 @@ class Game:
         self.activeplayer = None
         self.inactiveplayer = None
         
-    
+        self.selectedTile = None
     
     
         

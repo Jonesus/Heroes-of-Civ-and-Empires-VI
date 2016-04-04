@@ -23,6 +23,7 @@ class Button:
         self.screen = screen
         self.action = action
         
+        
         self.font = pygame.font.SysFont(font, 20)
         
         self.text = self.font.render(text, True, BLACK)

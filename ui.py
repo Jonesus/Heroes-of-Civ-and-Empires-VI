@@ -72,8 +72,16 @@ class Gameview:
                     
                     self.screen.blit(self.game.map[i+self.currenty][j+self.currentx].unit.img, \
                                  (j * TILESIZE, i * TILESIZE))
-    
-
+                
+                if self.game.selectedTile:
+                    print("moi")
+                    if self.game.selectedTile.x == j+self.currentx and \
+                       self.game.selectedTile.y == i+self.currenty:
+                        print("hei")
+                        pygame.draw.rect(self.screen, (255,255,255), (self.x*TILESIZE,self.y*TILESIZE,TILESIZE,TILESIZE), 2)
+                
+                self.game.selectedTile = self.game.map[i+self.currenty][j+self.currentx].click(self.screen, self.currentx, self.currenty, TILESIZE)
+                #print(self.game.selectedTile)
     
     
     def moveView(self, direction):
