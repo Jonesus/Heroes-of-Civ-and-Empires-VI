@@ -1,9 +1,12 @@
 import pygame
+import time
 
 
-LANDSCAPES = {"M":(False, "tiles/mountain.png"), \
-              "G":(True, "tiles/grass.png"), \
-              "W":(False, "tiles/water.png")}
+LANDSCAPES = {".":(True,  "graphics/tiles/grass.png"),    \
+              ",":(True,  "graphics/tiles/grass.png"),    \
+              "G":(True,  "graphics/tiles/grass.png"),    \
+              "M":(False, "graphics/tiles/mountain.png"), \
+              "W":(False, "graphics/tiles/water.png")}
 
 
 
@@ -14,7 +17,16 @@ class Tile:
         self.x = x
         self.y = y
         
+        self.startpos = None
+        if landscape == ".":
+            self.startpos = 1
+        elif landscape == ",":
+            self.startpos = 2
+        
+        
         self.unit = None
+        self.visited = False
+        self.previous = None
         
         self.pathable = LANDSCAPES[landscape][0]
         self.img      = pygame.image.load( LANDSCAPES[landscape][1] ).convert()
@@ -22,11 +34,8 @@ class Tile:
     
         
     def addUnit(self, unit):
-        if self.unit:
-            return 0
-        
+        self.pathable = False
         self.unit = unit
-        return 1
     
     
     
@@ -36,11 +45,21 @@ class Tile:
         clicked = pygame.mouse.get_pressed()
         
         if (self.x-currentx)*size+size > mousePos[0] >= (self.x-currentx)*size and (self.y-currenty)*size+size > mousePos[1] >= (self.y-currenty)*size:
-            pygame.draw.rect(screen, (0,0,0), ((self.x-currentx)*size,(self.y-currenty)*size,size,size), 2)    
+            pygame.draw.rect(screen, (0,0,0), ((self.x-currentx)*size,(self.y-currenty)*size,size,size), 2)
             if clicked[0] == 1:
-                return self
+                time.sleep(0.1)
+                pygame.event.poll()
+                clicked = pygame.mouse.get_pressed()
+                if clicked[0] == 0:
+                    return 1, self
+            elif clicked[2] == 1:
+                time.sleep(0.1)
+                pygame.event.poll()
+                clicked = pygame.mouse.get_pressed()
+                if clicked[2] == 0:
+                    return 2, self
             
-        return None
+        return 0, None
     
         
     

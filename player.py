@@ -1,11 +1,14 @@
-
+import pygame
 
 class Player:
     
-    def __init__(self):
-
+    def __init__(self, ID, startTile, game):
+        
+        
+        self.ID = ID
         self.units = []
-    
+        self.startTile = startTile
+        self.game = game
     
     
     def actionsLeft(self):
@@ -16,6 +19,12 @@ class Player:
         
         return False
     
+    def colorizeUnits(self):
+        
+        for unit in self.units:
+            arr = pygame.PixelArray(unit.sprite)
+            arr.replace((255,255,255), (0,0,255))
+            del arr
     
     
     def resetUnits(self):

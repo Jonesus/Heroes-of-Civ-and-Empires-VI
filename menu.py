@@ -1,4 +1,5 @@
 import pygame
+import time
 
 BLACK = (  0,   0,   0)
 WHITE = (255, 255, 255)
@@ -39,7 +40,11 @@ class Button:
         if self.x+self.width > mousePos[0] > self.x and self.y+self.height > mousePos[1] > self.y:
             pygame.draw.rect(self.screen, self.activeColor,(self.x,self.y,self.width,self.height))
             if clicked[0] == 1 and self.action != None:
-                return self.action()
+                time.sleep(0.1)
+                pygame.event.poll()
+                clicked = pygame.mouse.get_pressed()
+                if clicked[0] == 0:
+                    return self.action()
             
         else:
             pygame.draw.rect(self.screen, self.color,(self.x,self.y,self.width,self.height))

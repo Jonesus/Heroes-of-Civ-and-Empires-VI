@@ -1,0 +1,7 @@
+NAME:Swordsman
+IMG:graphics/portraits/swordsman.png
+SPRITE:graphics/sprites/swordsman.png
+HP:100
+DMG:20
+RANGE:1
+MOVES:5

@@ -35,26 +35,25 @@ class Unit:
     '''
     
     
-    def __init__(self, x, y, sourcefile):
+    def __init__(self, x, y, playerid, sourcefile):
         
-        file = open(sourcefile, 'r')
         self.attributedict = {}
+        with open(sourcefile, 'r') as file:
+            for line in file:
+                linelist = line.split(':')
+                self.attributedict[ linelist[0] ] = linelist[1].rstrip()
         
-        for line in file:
-            linelist = line.split(':')
-            self.attributedict[ linelist[0] ] = linelist[1]
+        self.x     = x
+        self.y     = y
+        self.playerID = playerid
+        self.name  = self.attributedict["NAME"]
+        self.hp    = int( self.attributedict["HP"] )
+        self.dmg   = int( self.attributedict["DMG"] )
+        self.range = int( self.attributedict["RANGE"] )
+        self.moves = int( self.attributedict["MOVES"] )
         
-        file.close()
-        
-        self.x = x
-        self.y = y
-        self.name = self.attributedict["NAME"]
-        self.hp = self.attributedict["HP"]
-        self.dmg = self.attributedict["DMG"]
-        self.range = self.attributedict["RANGE"]
-        self.moves = self.attributedict["MOVES"]
-        
-        self.img = pygame.image.load( self.attributedict["IMAGE"] ).convert()
+        self.img = pygame.image.load( self.attributedict["IMG"] ).convert_alpha()
+        self.sprite = pygame.image.load( self.attributedict["SPRITE"] ).convert_alpha()
 
         
     def move(self, direction):
@@ -72,7 +71,7 @@ class Unit:
     
     
     def resetMoves(self):
-        self.moves = self.attributedict["MOVES"]
+        self.moves = int( self.attributedict["MOVES"] )
     
     
     

@@ -3,7 +3,7 @@ from pygame.locals import *
 
 
 from menu import Menu
-from ui import UI
+from ui import Gameview
 from game import Game
 
 UP    = ( 0 ,-1)
@@ -13,6 +13,8 @@ RIGHT = ( 1 , 0)
 
 
 def main():
+    
+    # Initialize all pygame constants and variables
     
     pygame.display.init()
     pygame.init()
@@ -26,11 +28,14 @@ def main():
     pygame.display.set_caption("Heroes of Civ and Empires VI")
     FPS = 30
     
+    # Initialize the game itself, read default file for map
+    
     game = Game("maps/default.txt")
     
+    # Initialize 
     
     mainMenu = Menu(gameScreen)
-    gameUI = UI(gameScreen, game)
+    gameUI = Gameview(gameScreen, game)
     
     activeDisplay = 0
     
@@ -58,17 +63,19 @@ def main():
                     activeDisplay = 0
 
                 elif event.key == K_UP and activeDisplay == 1:
-                    gameUI.gameview.moveView(UP)
+                    gameUI.moveView(UP)
                     
                 elif event.key == K_DOWN and activeDisplay == 1:
-                    gameUI.gameview.moveView(DOWN)
+                    gameUI.moveView(DOWN)
                     
                 elif event.key == K_LEFT and activeDisplay == 1:
-                    gameUI.gameview.moveView(LEFT)
+                    gameUI.moveView(LEFT)
 
                 elif event.key == K_RIGHT and activeDisplay == 1:
-                    gameUI.gameview.moveView(RIGHT)
-
+                    gameUI.moveView(RIGHT)
+                
+                elif event.key == K_r and activeDisplay == 1:
+                    game.player1.resetUnits()
 
 
 
