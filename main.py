@@ -75,9 +75,10 @@ def main():
                     gameUI.moveView(RIGHT)
                 
                 elif event.key == K_r and activeDisplay == 1:
-                    game.player1.resetUnits()
-
-
+                    if game.selectedTile:
+                        if game.selectedTile.unit:
+                            game.selectedTile.unit.resetMoves()
+                            gameUI.taskbar.updateTexts()
 
 
 

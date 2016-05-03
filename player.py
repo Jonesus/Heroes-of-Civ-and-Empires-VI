@@ -19,11 +19,11 @@ class Player:
         
         return False
     
-    def colorizeUnits(self):
+    def colorizeUnits(self, colour):
         
         for unit in self.units:
             arr = pygame.PixelArray(unit.sprite)
-            arr.replace((255,255,255), (0,0,255))
+            arr.replace((255,255,255), colour)
             del arr
     
     

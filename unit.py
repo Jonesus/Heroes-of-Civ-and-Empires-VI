@@ -52,6 +52,8 @@ class Unit:
         self.range = int( self.attributedict["RANGE"] )
         self.moves = int( self.attributedict["MOVES"] )
         
+        self.tag = None
+        
         self.img = pygame.image.load( self.attributedict["IMG"] ).convert_alpha()
         self.sprite = pygame.image.load( self.attributedict["SPRITE"] ).convert_alpha()
 

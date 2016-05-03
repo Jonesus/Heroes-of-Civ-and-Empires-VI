@@ -1,0 +1,7 @@
+NAME:Archer
+IMG:graphics/portraits/archer.png
+SPRITE:graphics/sprites/archer.png
+HP:60
+DMG:20
+RANGE:3
+MOVES:5

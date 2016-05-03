@@ -1,8 +1,12 @@
 from tile import Tile
 from player import Player
+from ai import AI
 from unit import Unit
 from random import randint
 
+
+BLUE = (  0,   0, 255)
+RED  = (255,   0,   0)
 
 class Game:
     
@@ -24,14 +28,15 @@ class Game:
         #TODO: raise corruptedmapfile
         
         self.player1 = Player(1, self.p1start, self)
-        self.player2 = Player(2, self.p2start, self)
-        self.activeplayer = None
-        self.inactiveplayer = None
+        self.player2 = AI(2, self.p2start, self)
+        self.activePlayer = self.player1
+        self.inactivePlayer = self.player2
         
         self.selectedTile = None
         
         
         self.initializeUnits(self.player1)
+        self.initializeUnits(self.player2)
     
     
         
@@ -99,8 +104,10 @@ class Game:
                     donecount += 1
             unitrange += 1    
         
-        
-        player.colorizeUnits()
+        if player.ID == 1:
+            player.colorizeUnits(BLUE)
+        elif player.ID == 2:
+            player.colorizeUnits(RED)
     
 
     
@@ -109,15 +116,29 @@ class Game:
             return abs(tile1.x - tile2.x) + abs(tile1.y - tile2.y)    
         
     
+    
+    
     def moveUnit(self, sourceTile, targetTile):
         
+        '''
+        Moves unit from [sourceTile] to [targetTile] if unit as enough moves left,
+        otherwise to a tile in between the source and target.
+        
+        Returns: nothing
+        '''
+        
         if not sourceTile or not targetTile.pathable:
+            print("Target tile not pathable!")
             return
         
         if not sourceTile.unit:
+            print("No unit in source tile!")
+            print(sourceTile.x, sourceTile.y)
             return
         
-        if not sourceTile.unit.moves:
+        if sourceTile.unit.moves < 1:
+            print("Source tile unit has no moves!")
+            print(sourceTile.unit.moves, sourceTile.x, sourceTile.y)
             return
         
         
@@ -127,18 +148,34 @@ class Game:
             
             sourceTile.unit.moves -= dist
             dist -= 1
+            
+            print("Unit coords before: {} {}, tile coords before: {} {}"\
+                  .format(sourceTile.unit.x, sourceTile.unit.y, sourceTile.x, sourceTile.y))
+            
             sourceTile.unit.x, sourceTile.unit.y = path[dist].x, path[dist].y
             sourceTile.unit, path[dist].unit = path[dist].unit, sourceTile.unit
-            self.selectedTile.pathable  = True
+            
+            print("Unit coords after: {} {}, tile coords after: {} {}"\
+                  .format(path[dist].x, path[dist].y, path[dist].unit.x, path[dist].unit.y))
+            
+            sourceTile.pathable = True
             self.selectedTile = path[dist]
         
         elif path != None and sourceTile.unit.moves > 0:
             
             tempmoves = sourceTile.unit.moves - 1
             sourceTile.unit.moves = 0
+            
+            print("Unit coords before: {} {}, tile coords before: {} {}"\
+                  .format(sourceTile.unit.x, sourceTile.unit.y, sourceTile.x, sourceTile.y))
+            
             sourceTile.unit.x, sourceTile.unit.y = path[tempmoves].x, path[tempmoves].y
             sourceTile.unit, path[tempmoves].unit = path[tempmoves].unit, sourceTile.unit
-            self.selectedTile.pathable  = True
+            
+            print("Unit coords after: {} {}, tile coords after: {} {}"\
+                  .format(path[tempmoves].unit.x, path[tempmoves].unit.y, path[tempmoves].x, path[tempmoves].y))
+            
+            sourceTile.pathable = True
             self.selectedTile = path[tempmoves]
         
         
@@ -149,13 +186,13 @@ class Game:
     def dealDamage(self, sourceTile, targetTile):
         
         if not sourceTile or not targetTile:
-            return
+            return False
         
         if not sourceTile.unit:
-            return
+            return False
         
         if not sourceTile.unit.moves:
-            return
+            return False
         
         
         dist = self.distance(sourceTile, targetTile)
@@ -165,6 +202,9 @@ class Game:
             targetTile.unit.hp -= sourceTile.unit.dmg
             
             print("Target hp left:", targetTile.unit.hp)
+        else: 
+            return False
+        
         
         if targetTile.unit.hp <= 0:
             
@@ -176,15 +216,34 @@ class Game:
                 targetTile.unit = None
                 targetTile.pathable = True
     
+        return True
     
     
     
     
-    
-    def processTurn(self, player):
-        pass
+    def swapPlayers(self):
         
+        self.activePlayer, self.inactivePlayer = self.inactivePlayer, self.activePlayer
     
+    
+    
+    def switchTurn(self):
+        
+        print("Switching turns")
+        self.swapPlayers()
+        if self.activePlayer.ID == 2:
+            print("--------------------")
+            print("--------------------")
+            print("Processing AI's turn")
+            print("--------------------")
+            print("--------------------")
+            self.activePlayer.processTurn()
+            print("Done")
+            print("--------------------\n")
+            
+        self.swapPlayers()
+        self.activePlayer.resetUnits()
+        print("Player 1 active\n\n")
     
     
     
@@ -222,7 +281,10 @@ class Game:
         for thing in neighbours:
             thing[0].previous = tile
         
+        #TODO: Finding estimated path
+        
         return neighbours
+    
     
     
     def resetTiles(self):
@@ -236,8 +298,12 @@ class Game:
     
     def findPath(self, start, goal):
         
-        # Greedy best-first search
+        '''
+        Finds path between [start] and [goal] using greedy best-first search
         
+        Returns: list of tiles from start to goal or None if path not found
+        '''
+                
         def getKey(item):
             return item[1]
         
@@ -258,7 +324,7 @@ class Game:
                     path.append(tile)
                     tile = tile.previous
                     
-                print("Found", len(path), "tiles long path after", iters, "iterations")
+                #print("Found", len(path), "tiles long path after", iters, "iterations")
                 self.resetTiles()
                 return list(reversed(path))
                 
@@ -269,6 +335,7 @@ class Game:
             iters += 1
             
         self.resetTiles()
+        print("Can't find path!")
         return None
     
     

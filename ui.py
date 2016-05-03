@@ -1,15 +1,17 @@
 import pygame
 from datetime import datetime
+from menu import Button
 
 
 # Color constants
 BLACK = (  0,   0,   0)
+GRAY  = ( 50,  50,  50)
 WHITE = (255, 255, 255)
-BLUE =  (  0,   0, 255)
+BLUE  = (  0,   0, 255)
 GREEN = (  0, 255,   0)
 LGREEN= (100, 255, 100)
-RED =   (255,   0,   0)
-LRED =  (255, 100, 100)
+RED   = (255,   0,   0)
+LRED  = (255, 100, 100)
 
 
 # Visual constants
@@ -130,6 +132,7 @@ class Gameview:
         self.game = game
         
         self.taskbar = Taskbar(self.screen, self.game)
+        self.turnButton = Button("Next turn",self.screen.get_width() - 250, self.screen.get_height() - (TASKBARHEIGHT//2) - 25, 200, 50, GREEN, LGREEN, self.screen, action = self.game.switchTurn)
         
         self.viewx = int( self.screen.get_width() / TILESIZE )
         self.viewy = int( ( self.screen.get_height() - TASKBARHEIGHT ) / TILESIZE )
@@ -147,6 +150,14 @@ class Gameview:
         
         self.screen.fill(BLACK)
         self.taskbar.draw()
+        
+        if self.game.activePlayer.ID == 1:
+            if self.game.activePlayer.actionsLeft():
+                self.turnButton.color = GRAY
+            else:
+                self.turnButton.color = GREEN
+            self.turnButton.draw()
+        
         
         for i in range(self.viewy):
             for j in range(self.viewx):
@@ -195,7 +206,7 @@ class Gameview:
         
         
         return 1            
-                    
+        
     
     def moveView(self, direction):
         
