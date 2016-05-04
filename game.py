@@ -80,7 +80,7 @@ class Game:
                 unitcount += int(linelist[1])   
                 for i in range( int(linelist[1]) ):
                     pathToUnit = "units/" + linelist[0] + ".txt" 
-                    player.units.append(Unit(None, None, player.ID, pathToUnit))
+                    player.units.append(Unit(player.ID, pathToUnit))
         
         
         
@@ -88,20 +88,21 @@ class Game:
         unitrange = 1
         while donecount != unitcount:
             for i in range(unitcount):
-                if not player.units[i].x:
+                if not player.units[i].tag:
                     randx = randint(player.startTile.x - unitrange, player.startTile.x + unitrange)
                     randy = randint(player.startTile.y - unitrange, player.startTile.y + unitrange)
                     
-                    if randx < 0 or randx > self.xsize or randy < 0 or randy > self.ysize:
+                    if randx < 0 or randx >= self.xsize or randy < 0 or randy >= self.ysize:
                         continue
                     
                     if not self.map[randy][randx].pathable:
                         continue
                         
                     self.map[randy][randx].addUnit(player.units[i])
-                    player.units[i].x = randx
-                    player.units[i].y = randy
+                    self.map[randy][randx].unit.tag = 1
+                    
                     donecount += 1
+                    
             unitrange += 1    
         
         if player.ID == 1:
@@ -109,7 +110,19 @@ class Game:
         elif player.ID == 2:
             player.colorizeUnits(RED)
     
-
+    
+        self.untagUnits(player)
+        
+        
+        
+        
+    
+    def untagUnits(self, player):   
+        for unit in player.units:
+            unit.tag = None
+            
+            
+            
     
     
     def distance(self, tile1, tile2):
@@ -148,15 +161,12 @@ class Game:
             
             sourceTile.unit.moves -= dist
             dist -= 1
+            #print("Distance: {}".format(dist))
+            #print("Tile coords before: {} {}".format(sourceTile.x, sourceTile.y))
             
-            print("Unit coords before: {} {}, tile coords before: {} {}"\
-                  .format(sourceTile.unit.x, sourceTile.unit.y, sourceTile.x, sourceTile.y))
-            
-            sourceTile.unit.x, sourceTile.unit.y = path[dist].x, path[dist].y
             sourceTile.unit, path[dist].unit = path[dist].unit, sourceTile.unit
             
-            print("Unit coords after: {} {}, tile coords after: {} {}"\
-                  .format(path[dist].x, path[dist].y, path[dist].unit.x, path[dist].unit.y))
+            #print("Tile coords after: {} {}".format(path[dist].x, path[dist].y))
             
             sourceTile.pathable = True
             self.selectedTile = path[dist]
@@ -166,14 +176,12 @@ class Game:
             tempmoves = sourceTile.unit.moves - 1
             sourceTile.unit.moves = 0
             
-            print("Unit coords before: {} {}, tile coords before: {} {}"\
-                  .format(sourceTile.unit.x, sourceTile.unit.y, sourceTile.x, sourceTile.y))
+            #print("Tile coords before: {} {}".format(sourceTile.x, sourceTile.y))
+            #print("Unit: {}, dest: {}".format(sourceTile.unit, path[tempmoves].unit))
             
-            sourceTile.unit.x, sourceTile.unit.y = path[tempmoves].x, path[tempmoves].y
             sourceTile.unit, path[tempmoves].unit = path[tempmoves].unit, sourceTile.unit
             
-            print("Unit coords after: {} {}, tile coords after: {} {}"\
-                  .format(path[tempmoves].unit.x, path[tempmoves].unit.y, path[tempmoves].x, path[tempmoves].y))
+            #print("Tile coords after: {} {}".format(path[tempmoves].x, path[tempmoves].y))
             
             sourceTile.pathable = True
             self.selectedTile = path[tempmoves]
@@ -186,12 +194,15 @@ class Game:
     def dealDamage(self, sourceTile, targetTile):
         
         if not sourceTile or not targetTile:
+            print("Shit parameters lol")
             return False
         
         if not sourceTile.unit:
+            print("Shit sourcetile lol")
             return False
         
         if not sourceTile.unit.moves:
+            print("No moves lol")
             return False
         
         
@@ -202,16 +213,20 @@ class Game:
             targetTile.unit.hp -= sourceTile.unit.dmg
             
             print("Target hp left:", targetTile.unit.hp)
-        else: 
+        else:
+            print("Not in range")
             return False
         
         
         if targetTile.unit.hp <= 0:
             
             if targetTile.unit.playerID == 1:
+                print("Player 1's {} got killed!".format(targetTile.unit.name))
                 self.player1.units.remove(targetTile.unit)
                 targetTile.unit = None
+                targetTile.pathable = True
             elif targetTile.unit.playerID == 2:
+                print("Player 2's {} got killed!".format(targetTile.unit.name))
                 self.player2.units.remove(targetTile.unit)
                 targetTile.unit = None
                 targetTile.pathable = True
@@ -229,7 +244,7 @@ class Game:
     
     def switchTurn(self):
         
-        print("Switching turns")
+        print("Switching turns\n")
         self.swapPlayers()
         if self.activePlayer.ID == 2:
             print("--------------------")
@@ -237,9 +252,13 @@ class Game:
             print("Processing AI's turn")
             print("--------------------")
             print("--------------------")
-            self.activePlayer.processTurn()
+            ret = self.activePlayer.processTurn()
             print("Done")
             print("--------------------\n")
+        
+        if ret == -1:
+            print("Game over lol")
+            return -1
             
         self.swapPlayers()
         self.activePlayer.resetUnits()

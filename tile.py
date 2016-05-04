@@ -24,8 +24,8 @@ class Tile:
             self.startpos = 2
         
         
-        self.unit = None
-        self.visited = False
+        self.unit     = None
+        self.visited  = False
         self.previous = None
         
         self.pathable = LANDSCAPES[landscape][0]

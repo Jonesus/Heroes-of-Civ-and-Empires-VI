@@ -27,7 +27,7 @@ class AI(Player):
     
     def processTurn(self):
         
-        i = 0
+        uniti = 0
         movesSum = 0
         previousMoves = -1
         iters = 3
@@ -38,43 +38,57 @@ class AI(Player):
             print("New iteration")
             print("-------------\n\n")
             
-            for unit in self.units:
-                
-                print("unit moves before: {}".format(unit.moves))
-                
-                if unit.moves:
-                    distance = self.estimatedDistance(5, unit)
-                    
-                    if not distance:
-                        i+=1
-                        movesSum += unit.moves
-                        print("unit moves after: {}".format(unit.moves))
-                        print("unit {}/{} done".format(i, len(self.units)))
-                        print()
-                        
-                        continue
-                    
-                    distance = len(distance)
-                    
-                    
-                    if distance > 8:
-                        print("Approaching")
-                        self.approachEnemy(unit)
-                    
-                    else:
-                        print("Attacking")
-                        self.attackNearestEnemy(unit)
-                    
-                    
-                    movesSum += unit.moves
-                    
-                i+=1
-                    
-                print("unit moves after: {}".format(unit.moves))
-                print("unit {}/{} done".format(i, len(self.units)))
-                print()
             
-            i = 0
+            for i in range(self.game.ysize):
+                for j in range(self.game.xsize):
+                    if self.game.map[i][j].unit:
+                        if self.game.map[i][j].unit.playerID == 2:
+                            
+                            tile = self.game.map[i][j]
+                            unit = self.game.map[i][j].unit
+                            
+                            
+                            print("Unit: {}".format(unit.name))
+                            print("unit moves before: {}".format(tile.unit.moves))
+                            
+                            
+                            if tile.unit.moves:
+                                distance = self.estimatedDistance(5, tile)
+                                
+                                if distance == -1:
+                                    return -1
+                                
+                                if not distance:
+                                    print("Couldn't get distance!")
+                                    uniti+=1
+                                    movesSum += tile.unit.moves
+                                    print("unit moves after: {}".format(tile.unit.moves))
+                                    print("unit {}/{} done".format(uniti, len(self.units)))
+                                    print()
+                                    
+                                    continue
+                                
+                                distance = len(distance)
+                                print("Est.dist. {}".format(distance))
+                                
+                                if distance > 10:
+                                    print("Approaching")
+                                    self.approachEnemy(tile)
+                                
+                                else:
+                                    print("Attacking")
+                                    self.attackNearestEnemy(tile)
+                                
+                                
+                                movesSum += unit.moves
+                                
+                            uniti+=1
+                    
+                            print("unit moves after: {}".format(unit.moves))
+                            print("unit {}/{} done".format(uniti, len(self.units)))
+                            print()
+            
+            uniti = 0
             
             print("total moves left: {}".format(movesSum))
             
@@ -88,15 +102,12 @@ class AI(Player):
         
         
         self.resetUnits()
-        self.untagUnits()
+        self.game.untagUnits(self)
         
         
-    def untagUnits(self):   
-        for unit in self.units:
-            unit.tag = None
     
 
-    def estimatedDistance(self, iters = 3, unit = None):
+    def estimatedDistance(self, iters = 3, tile = None):
         
         '''
         Get [iters] random unit coords from both players, average their position,
@@ -106,17 +117,33 @@ class AI(Player):
         Returns: Estimated length between both players' armies (int)
         '''
         
+        p1unitCoords = []
+        p2unitCoords = []
+        
+        for i in range(self.game.ysize):
+            for j in range(self.game.xsize):
+                if self.game.map[i][j].unit:
+                    if self.game.map[i][j].unit.playerID == 1:
+                        p1unitCoords.append((j,i))
+                    else:
+                        p2unitCoords.append((j,i))
+        
+        
+        if len(p1unitCoords) == 0 or len(p2unitCoords) == 0:
+            return -1
+        
+        
         coordList = []
         
         for i in range(iters):
-            rand1 = randint(0, len(self.units)-1)
-            rand2 = randint(0, len(self.game.player1.units)-1)
+            rand1 = randint(0, len(p1unitCoords)-1)
+            rand2 = randint(0, len(p2unitCoords)-1)
             
-            x1 = self.units[rand1].x
-            y1 = self.units[rand1].y
+            x1 = p1unitCoords[rand1][0]
+            y1 = p1unitCoords[rand1][1]
             
-            x2 = self.game.player1.units[rand2].x
-            y2 = self.game.player1.units[rand2].y
+            x2 = p2unitCoords[rand2][0]
+            y2 = p2unitCoords[rand2][1]
             
             coordList.append( ((x1,y1),(x2,y2)) )
         
@@ -137,11 +164,11 @@ class AI(Player):
         tile2 = self.findNearestPathable(self.game.map[y2sum][x2sum])
         
         
-        if unit:
-            path = self.game.findPath( self.game.map[unit.y][unit.x], tile2 )
+        if tile:
+            path = self.game.findPath(tile, tile1)
             return path
         else:
-            path = self.game.findPath(tile1, tile2)
+            path = self.game.findPath(tile2, tile1)
             return len(path)
         
         
@@ -151,7 +178,7 @@ class AI(Player):
         
             
             
-    def findNearestEnemy(self, unit, interval = 2, maxDist = 10):
+    def findNearestEnemy(self, tile, interval = 2, maxDist = 10):
         
         '''
         Iterates around [unit]'s tiles until finds enemy unit or has searched
@@ -163,11 +190,13 @@ class AI(Player):
         offset = interval
         
         while offset < maxDist:
-            for j in range(unit.y - offset, unit.y + offset):
-                for i in range(unit.x - offset, unit.x + offset):
-                    if self.game.map[j][i].unit:
-                        if self.game.map[j][i].unit.playerID == 1:
-                            return self.game.map[j][i]
+            for j in range(tile.y - offset, tile.y + offset):
+                for i in range(tile.x - offset, tile.x + offset):
+                    if i < self.game.xsize and i >= 0 \
+                    and j < self.game.ysize and j >= 0:
+                        if self.game.map[j][i].unit:
+                            if self.game.map[j][i].unit.playerID == 1:
+                                return self.game.map[j][i]
             
             offset += interval
         
@@ -200,70 +229,79 @@ class AI(Player):
         
         
         
-    def moveNearUnit(self, unit, target, distance = None):
+    def moveNearUnit(self, unitTile, target, distance = None):
         
         ''' Moves [unit] as close to [target] as needed for it to attack '''
         
         if not distance:
-            distance = unit.range
+            distance = unitTile.unit.range
         
         targetTile = self.findNearestPathable(target)
         
-        path = self.game.findPath(self.game.map[unit.y][unit.x], targetTile)
+        path = self.game.findPath(unitTile, targetTile)
+        
+        if not path:
+            return
         
         if len(path) == 0:
-            unit.moves = 0
+            unitTile.unit.moves = 0
         
         indexOffset = distance if distance < len(path) else len(path)
-        print("indexOffset: {} pathlen: {}".format(indexOffset, len(path)))
+        #print("indexOffset: {} pathlen: {}".format(indexOffset, len(path)))
         if len(path):
-            self.game.moveUnit(self.game.map[unit.y][unit.x], path[0-indexOffset])
+            self.game.moveUnit(unitTile, path[0-indexOffset])
         
 
     
     
-    def approachEnemy(self, unit):
+    def approachEnemy(self, unitTile):
         
         '''
         Moves [unit] towards enemy army. Makes the units assign and follow a leader
         to move in a group.
         '''
         
-        leader = None
-        for troop in self.units:
-            if troop.tag == LEADERTAG:
-                leader = troop
+        leaderTile = None
+        for i in range(self.game.ysize):
+                for j in range(self.game.xsize):
+                    if self.game.map[i][j].unit:
+                        if self.game.map[i][j].unit.playerID == 2 \
+                        and self.game.map[i][j].unit.tag == LEADERTAG:
+                            leaderTile = self.game.map[i][j]
         
         
         
-        if not leader:
-            unit.tag = LEADERTAG
-            path = self.estimatedDistance(5, unit)
+        if not leaderTile:
+            unitTile.unit.tag = LEADERTAG
+            path = self.estimatedDistance(5, unitTile)
             
             if not path:
                 return
             
-            dist = unit.moves if unit.moves < len(path) else len(path) - 1
-            print("gonna lead")
-            self.game.moveUnit(self.game.map[unit.y][unit.x], path[dist])
+            dist = unitTile.unit.moves if unitTile.unit.moves < len(path) else len(path) - 1
+            print("New leader")
+            self.game.moveUnit(unitTile, path[dist])
             
         else:
-            print("gonna move")
-            self.moveNearUnit(unit, leader, 0)
+            print("Moving towards leader")
+            self.moveNearUnit(unitTile, leaderTile, 0)
             
     
 
     
     
-    def attackNearestEnemy(self, unit):
+    def attackNearestEnemy(self, unitTile):
         
         ''' Finds nearest enemy unit and attacks it once, if fails then moves closer'''
         
-        target = self.findNearestEnemy(unit, 1)
+        target = self.findNearestEnemy(unitTile, interval = 1, maxDist = 12)
+        
+        print("Distance from target: {}".format(self.game.distance(unitTile, target)))
         
         if target:
-            if not self.game.dealDamage(self.game.map[unit.y][unit.x], target):
-                self.moveNearUnit(unit, target)
+            if not self.game.dealDamage(unitTile, target):
+                print("Moving closer")
+                self.moveNearUnit(unitTile, target)
                 
         
         

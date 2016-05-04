@@ -1,14 +1,6 @@
 import pygame
 
 
-UP    = ( 1 , 0)
-DOWN  = (-1 , 0)
-LEFT  = ( 0 ,-1)
-RIGHT = ( 0 , 1)
-
-DIRECTIONS = (UP, DOWN, LEFT, RIGHT)
-
-# X and Y coordinate additions for movement in each direction
 
 class Unit:
     
@@ -35,7 +27,7 @@ class Unit:
     '''
     
     
-    def __init__(self, x, y, playerid, sourcefile):
+    def __init__(self, playerid, sourcefile):
         
         self.attributedict = {}
         with open(sourcefile, 'r') as file:
@@ -43,12 +35,10 @@ class Unit:
                 linelist = line.split(':')
                 self.attributedict[ linelist[0] ] = linelist[1].rstrip()
         
-        self.x     = x
-        self.y     = y
         self.playerID = playerid
-        self.name  = self.attributedict["NAME"]
-        self.hp    = int( self.attributedict["HP"] )
-        self.dmg   = int( self.attributedict["DMG"] )
+        self.name  =      self.attributedict["NAME"]
+        self.hp    = int( self.attributedict["HP"]    )
+        self.dmg   = int( self.attributedict["DMG"]   )
         self.range = int( self.attributedict["RANGE"] )
         self.moves = int( self.attributedict["MOVES"] )
         
@@ -58,19 +48,7 @@ class Unit:
         self.sprite = pygame.image.load( self.attributedict["SPRITE"] ).convert_alpha()
 
         
-    def move(self, direction):
-        
-        if direction not in DIRECTIONS or self.moves == 0:
-            return 0
-        
-        self.x += direction[0]
-        self.y += direction[1]
-        
-        self.moves -= 1
-        
-        return 1
-    
-    
+
     
     def resetMoves(self):
         self.moves = int( self.attributedict["MOVES"] )

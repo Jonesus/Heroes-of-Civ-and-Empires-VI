@@ -148,6 +148,8 @@ class Gameview:
         
     def draw(self):
         
+        ret = 0
+        
         self.screen.fill(BLACK)
         self.taskbar.draw()
         
@@ -156,7 +158,7 @@ class Gameview:
                 self.turnButton.color = GRAY
             else:
                 self.turnButton.color = GREEN
-            self.turnButton.draw()
+            ret = self.turnButton.draw()
         
         
         for i in range(self.viewy):
@@ -205,7 +207,7 @@ class Gameview:
                     
         
         
-        return 1            
+        return 1          
         
     
     def moveView(self, direction):
@@ -227,6 +229,24 @@ class Gameview:
         self.currenty += direction[1]
         
         return 1
+
+
+
+
+
+
+class Pauseview:
+    
+    def __init__(self, screen, game):
+        
+        self.screen = screen
+        self.game = game
+
+
+
+
+
+
 
 
 
