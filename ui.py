@@ -28,6 +28,12 @@ DIRECTIONS = (UP, DOWN, LEFT, RIGHT)
 
 
 
+
+
+
+
+
+
 class Text:
     
     def __init__(self, text, x, y, size, screen, color = BLACK, font = None):
@@ -51,6 +57,14 @@ class Text:
         self.text = self.font.render(text, True, self.color)
         
     
+
+
+
+
+
+
+
+
 
 
 
@@ -119,6 +133,16 @@ class Taskbar:
         
         pygame.draw.rect(self.screen, BLACK, (self.x,self.y,self.width,self.height))
         self.drawInfo()
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -199,9 +223,7 @@ class Gameview:
                     if temp.unit:
                         self.game.dealDamage(self.game.selectedTile, temp)
                     else:
-                        timenow = datetime.now()
                         self.game.moveUnit(self.game.selectedTile, temp)
-                        print("Time elapsed:", datetime.now() - timenow, "\n")
                         
                     self.taskbar.updateTexts()
                     
@@ -235,19 +257,52 @@ class Gameview:
 
 
 
+
+
+
+
+
+
+
 class Pauseview:
     
     def __init__(self, screen, game):
         
         self.screen = screen
         self.game = game
+        
+        self.x = 100
+        self.y = 100
+        self.height = self.screen.get_height() - 200
+        self.width = self.screen.get_width() - 200
+        
+        self.pausedText = Text("Game paused", self.screen.get_width()/2, self.y+40, 30, self.screen, BLUE,"Comic Sans MS")
+        self.continueButton = Button("Continue",self.screen.get_width()/2-100, self.height/2+50, 200, 50, GREEN, LGREEN, self.screen, action = self.continueGame)
+        self.endButton      = Button("End game",self.screen.get_width()/2-100, self.height/2+150, 200, 50, RED,   LRED,   self.screen, action = self.endGame)
+        
+        self.pausedText.x = self.pausedText.x - self.pausedText.text.get_width()/2
+        
+        self.objects = [self.pausedText, self.continueButton, self.endButton]
 
 
 
+    def draw(self):
+        
+        pygame.draw.rect(self.screen, WHITE, (self.x-5,self.y-5,self.width+10,self.height+10))
+        pygame.draw.rect(self.screen, BLACK, (self.x,self.y,self.width,self.height))
+        
+        for thing in self.objects:
+            ret = thing.draw()
+            if ret != None:
+                return ret
 
 
-
-
+    def continueGame(self):
+        return 1
+    
+    
+    def endGame(self):
+        return 0
 
 
 

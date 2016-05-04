@@ -3,7 +3,7 @@ from pygame.locals import *
 
 
 from menu import Menu
-from ui import Gameview
+from ui import Gameview, Pauseview
 from game import Game
 
 UP    = ( 0 ,-1)
@@ -34,12 +34,14 @@ def main():
     
     # Initialize 
     
-    mainMenu = Menu(gameScreen)
+    mainMenu = Menu(gameScreen, game)
     gameUI = Gameview(gameScreen, game)
+    
+    paused = Pauseview(gameScreen, game)
     
     activeDisplay = 0
     
-    displays = [mainMenu, gameUI]
+    displays = [mainMenu, gameUI, paused]
     
     
     
@@ -47,7 +49,9 @@ def main():
     
     while running:
         
-        activeDisplay = displays[activeDisplay].draw()
+        ret = displays[activeDisplay].draw()
+        if ret != None:
+            activeDisplay = ret
         
         pygame.display.update()
         gameClock.tick(FPS)
@@ -59,8 +63,11 @@ def main():
                 quit()
                 
             elif event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    activeDisplay = 0
+                if event.key == K_ESCAPE and activeDisplay == 1:
+                    activeDisplay = 2
+                
+                elif event.key == K_ESCAPE and activeDisplay == 2:
+                    activeDisplay = 1
 
                 elif event.key == K_UP and activeDisplay == 1:
                     gameUI.moveView(UP)

@@ -50,7 +50,7 @@ class Button:
             pygame.draw.rect(self.screen, self.color,(self.x,self.y,self.width,self.height))
 
         self.screen.blit(self.text, self.textRect)
-        return 0
+        return None
 
 
 class Text:
@@ -72,8 +72,9 @@ class Text:
     
 class Menu:
     
-    def __init__(self, screen):
+    def __init__(self, screen, game):
         
+        self.game = game
         self.screen = screen
         
         self.startButton = Button("Start",self.screen.get_width()/2-100, self.screen.get_height()/2-50, 200, 50, GREEN, LGREEN, self.screen, action = self.startGame)
@@ -90,14 +91,15 @@ class Menu:
         self.screen.fill(WHITE)
         for thing in self.objects:
             ret = thing.draw()
-            if ret == 1:
+            if ret != None:
                 return 1
         
-        return 0
+        return None
 
     
     
     def startGame(self):
+        self.game.__init__("maps/default.txt")
         return 1
 
     
