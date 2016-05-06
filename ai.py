@@ -7,23 +7,31 @@ LEADERTAG = 1
 
 class AI(Player):
     
+    '''
+    Represents the artificial intelligence opponent to play against.
+    Inherits variables and methods from Player class
+    
+    Methods:
+    processTurn(): evaluates the current position for each unit and either
+                   moves closer or attacks the nearest opponent's unit
+    estimatedDistance(): Estimates the distance of either both player's armies
+                         or a single unit and the opponent's army
+    findNearestEnemy(): Finds the nearest enemy unit
+    findNearestPathable(): Finds the nearest pathable tile
+    moveNearUnit(): Moves unit as close to the enemy as it needs to be to attack
+    approachEnemy(): Makes the units approach enemy's army
+    attackNearestEnemy(): Well duh
+    
+    '''
+    
+    
+    
+    
+    
     def __init__(self, ID, startTile, game):
         
         Player.__init__(self, ID, startTile, game)
-        pass
-    
-    
-    def evaluateMap(self):
-        
-        pass
-    
-    
-    
-    def createTask(self, unit):
-        
-        pass
-    
-    
+
     
     def processTurn(self):
         
@@ -308,6 +316,7 @@ class AI(Player):
         
     def retreat(self, unit):
         
+        # not yet implemented
         reason = self.findNearestEnemy(unit, 1)
         
         

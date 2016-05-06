@@ -42,11 +42,15 @@ class Tile:
         
         try:
             for line in mapsyntax:
+                if line[1][1] != "True" and line[1][1] != "False":
+                    raise IndexError
                 pathable = True if line[1][1] == "True" else False
                 LANDSCAPES[line[0]] = (pathable, line[1][0])
         
         except IndexError:
             print("Illegal map syntax!")
+            with open("log.txt", "w") as out:
+                out.write("Illegal map syntax!")
             quit()
             
         
@@ -61,10 +65,19 @@ class Tile:
         self.visited  = False
         self.previous = None
         
-        
-        self.pathable = LANDSCAPES[landscape][0]
-        self.img      = pygame.image.load( LANDSCAPES[landscape][1] ).convert()
-        
+        try:
+            self.pathable = LANDSCAPES[landscape][0]
+            self.img      = pygame.image.load( LANDSCAPES[landscape][1] ).convert()
+        except KeyError:
+            print("Map keys not found!")
+            with open("log.txt", "w") as out:
+                out.write("Map keys not found!")
+            quit()
+        except pygame.error:
+            print("Invalid tile image!")
+            with open("log.txt", "w") as out:
+                out.write("Invalid tile image!")
+            quit()
     
         
     def addUnit(self, unit):

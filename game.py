@@ -91,22 +91,31 @@ class Game:
         
         gamemap = []
         
-        file = open(mapfile, 'r')
-        
-        i = j = 0
-        for line in file:
-            if line[0] == "#" or line[0] == "\n":
-                continue
+        try:
+            with open(mapfile, 'r') as file:
             
-            gamemap.append([])
-            line = line.rstrip()
-            for char in line:
-                gamemap[i].append( Tile(j, i, char, mapsyntax) )
-                j += 1
-            xsize = j
-            j = 0
-            i += 1
-        ysize = i
+                i = j = 0
+                for line in file:
+                    if line[0] == "#" or line[0] == "\n":
+                        continue
+                    
+                    gamemap.append([])
+                    line = line.rstrip()
+                    for char in line:
+                        gamemap[i].append( Tile(j, i, char, mapsyntax) )
+                        j += 1
+                    xsize = j
+                    j = 0
+                    i += 1
+                ysize = i
+            
+        except FileNotFoundError:
+            
+            with open("log.txt", "w") as out:
+                out.write("Can't open map file!")
+            print("Can't open map file!")
+            quit()
+            
         
         return gamemap, xsize, ysize
     
@@ -116,25 +125,64 @@ class Game:
     
     def initializeUnits(self, player):
         
-        with open("units/player{}.txt".format(player.ID), 'r') as file:
+        '''
+        Reads the player's army composition from a file and
+        randomly distributes it around the player's starting point.
+        '''
+        
+        try:
+            with open("units/player{}.txt".format(player.ID), 'r') as file:
+                
+                unitcount = 0
+                
+                for line in file:
+                    
+                    if line[0] == "#" or line[0] == "\n":
+                        continue
+                    
+                    linelist = line.split('*')
+                    
+                    if int(linelist[1]) > 10:
+                        raise IndexError
+                        
+                    
+                    unitcount += int(linelist[1])   
+                    for i in range( int(linelist[1]) ):
+                        pathToUnit = "units/" + linelist[0] + ".txt" 
+                        player.units.append(Unit(player.ID, pathToUnit))
             
-            unitcount = 0
             
-            for line in file:
-                
-                if line[0] == "#" or line[0] == "\n":
-                    continue
-                
-                linelist = line.split('*')
-                
-                if int(linelist[1]) > 10:
-                    #TODO: raise unitcounterror
-                    return
-                
-                unitcount += int(linelist[1])   
-                for i in range( int(linelist[1]) ):
-                    pathToUnit = "units/" + linelist[0] + ".txt" 
-                    player.units.append(Unit(player.ID, pathToUnit))
+            pathablesum = 0
+            for row in self.map:
+                for tile in row:
+                    if tile.pathable:
+                        pathablesum += 1
+            
+            
+            unitsum = 0
+            if self.player1:
+                if self.player1.units:
+                    unitsum += len(self.player1.units)
+            if self.player2:
+                if self.player2.units:
+                    unitsum += len(self.player2.units)
+            
+            if unitsum + 10 >  pathablesum:
+                raise KeyError
+        
+        
+        except KeyError:
+            print("Not enough room in map for units!")
+            with open("log.txt", "w") as out:
+                out.write("not enough room in map for units!")
+            quit()
+            
+            
+        except:
+            print("Invalid player units file!")
+            with open("log.txt", "w") as out:
+                out.write("Invalid player units file!")
+            quit()
         
         
         
@@ -143,11 +191,20 @@ class Game:
         while donecount != unitcount:
             for i in range(unitcount):
                 if not player.units[i].tag:
-                    randx = randint(player.startTile.x - unitrange, player.startTile.x + unitrange)
-                    randy = randint(player.startTile.y - unitrange, player.startTile.y + unitrange)
                     
-                    if randx < 0 or randx >= self.xsize or randy < 0 or randy >= self.ysize:
-                        continue
+                    temp = player.startTile.x - unitrange
+                    randxmin = temp if temp > 0 else 0
+                    temp = player.startTile.x + unitrange
+                    randxmax = temp if temp < self.xsize else self.xsize-1
+                    temp = player.startTile.y - unitrange
+                    randymin = temp if temp > 0 else 0
+                    temp = player.startTile.y + unitrange
+                    randymax = temp if temp < self.ysize else self.ysize-1
+                    
+                    
+                    randx = randint(randxmin, randxmax)
+                    randy = randint(randymin, randymax)
+
                     
                     if not self.map[randy][randx].pathable:
                         continue

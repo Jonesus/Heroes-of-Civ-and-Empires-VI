@@ -25,16 +25,28 @@ DEFAULTP2COLOR = (255,  0,   0)
 
 def parseSetup():
     
+    '''
+    Reads the setup.txt file into a dictionary from where
+    the parameters are later processed
+    '''
+    
     setupDict = {}
     
-    with open("setup.txt", "r") as file:
-        for line in file:
-            if line[0] == "#" or line[0] == "\n":
-                continue
-            
-            linelist = line.rstrip().split(":")
-            setupDict[ linelist[0] ] = linelist[1]
-            
+    try:
+        with open("setup.txt", "r") as file:
+            for line in file:
+                if line[0] == "#" or line[0] == "\n":
+                    continue
+                
+                linelist = line.rstrip().split(":")
+                setupDict[ linelist[0] ] = linelist[1]
+    
+    except:
+        print("Failed to read setup.txt!")
+        with open("log.txt", "w") as out:
+            out.write("Failed to read setup.txt!")
+        quit()
+        
     return setupDict
     
     
@@ -55,7 +67,9 @@ def main():
     
     setup = parseSetup()
     
-
+    
+    # Check whether the visual settings from setup.txt are valid
+    
     
     try:
         if int(setup["width"]) > 400:
@@ -82,7 +96,9 @@ def main():
     gameClock = pygame.time.Clock()
     pygame.display.set_caption("Heroes of Civ and Empires VI")
     
+    
     # Initialize the game itself, read default file for map
+    
     
     mapsyntax = []
     
@@ -96,17 +112,22 @@ def main():
     
     except ValueError:
         print("Failed to read map syntax, illegal values in file!")
+        with open("log.txt", "w") as out:
+                out.write("Failed to read map syntax, illegal values in file!")
         quit()
         
         
     except KeyError:
         print("Failed to read map syntax, illegal keys in file!")
+        with open("log.txt", "w") as out:
+                out.write("Failed to read map syntax, illegal keys in file!")
         quit()
         
     else:
         print("Map syntax successfully parsed.")
     
     
+    # Check whether the player colors read from setup.txt are valid
     
     
     try:
@@ -142,7 +163,10 @@ def main():
     else:
         print("Player colors read successfully.")
     
-    game = Game(setup["mapfile"], mapsyntax, player1color, player2color)
+    
+    
+    # Check whether map file and syntax are valid
+    
     
     try:
         game = Game(setup["mapfile"], mapsyntax, player1color, player2color)
@@ -150,29 +174,42 @@ def main():
     
     except KeyError:
         print("No map file specified in setup.txt!")
+        with open("log.txt", "w") as out:
+                out.write("No map file specified in setup.txt!")
         quit()
     
+    
     # Initialize 
+    
     
     mainMenu = Menu(gameScreen, game, gameparams)
     
     paused = Pauseview(gameScreen, game)
     over = Gameover(gameScreen, game)
     
+    
     try:
         gameUI = Gameview(gameScreen, game, over, int(setup["tilesize"]))
     except ValueError:
-        print("Invalid tilesize in setup.txt!")
-        print("Resetting to defaults.")
+        print("Invalid tilesize in setup.txt!\nResetting to defaults.")
         gameUI = Gameview(gameScreen, game, over, 32)
         
+        
+    # Index of the currently visible display in the displays array
+      
     activeDisplay = 0
+    
     
     displays = [mainMenu, gameUI, paused, over]
     
     
     
     running = True
+    
+    
+    # Main loop which draws the screen and
+    # processes player inputs
+    
     
     while running:
         

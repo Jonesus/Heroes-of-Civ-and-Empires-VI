@@ -35,6 +35,22 @@ DIRECTIONS = (UP, DOWN, LEFT, RIGHT)
 
 class Text:
     
+    '''
+    Represents a generic piece of text shown on screen.
+    
+    Params:
+    text: Text in button
+    x, y: Coordinates for top left of button
+    size: Font size
+    screen: pygame screen where button is drawn
+    color: Color of text
+    font: font of text
+    
+    Methods:
+    draw(): Draws the text on the screen
+    '''
+    
+    
     def __init__(self, text, x, y, size, screen, color = BLACK, font = None):
         
         self.x = x
@@ -68,6 +84,19 @@ class Text:
 
 
 class Taskbar:
+    
+    '''
+    Represents the taskbar of the game view.
+    
+    Params:
+    screen: pygame screen
+    game: instance of Game class
+    
+    Methods:
+    updateTexts: Updates the unit attribute texts shown on the taskbar
+    drawInfo: Draws the unit attribute tetxs
+    draw: Draws the whole taskbar
+    '''
     
     def __init__(self, screen, game):
         
@@ -149,6 +178,22 @@ class Taskbar:
 
 class Gameview:
     
+    '''
+    Represents the game as shown to the player.
+    
+    Params:
+    screen: Pygame screen
+    game: Instance of Game class
+    gameover: Gameover popup window
+    tilesize: Size of each tile read from setup.txt
+    
+    Methods:
+    draw(): Draws the view
+    moveView(): Moves the current viewpoint
+    
+    '''
+    
+    
     def __init__(self, screen, game, gameover, tilesize):
         
         self.TILESIZE = tilesize
@@ -177,18 +222,21 @@ class Gameview:
         
     def draw(self):
         
-        ret = None
         
         self.screen.fill(BLACK)
         self.taskbar.draw()
+        
+        
+        # Draw the "next turn" button
         
         if self.game.activePlayer.ID == 1:
             if self.game.activePlayer.actionsLeft():
                 self.turnButton.color = GRAY
             else:
                 self.turnButton.color = GREEN
-            ret = self.turnButton.draw()
+            self.turnButton.draw()
         
+        # Draw the tiles and units
         
         for i in range(self.viewy):
             for j in range(self.viewx):
@@ -208,7 +256,7 @@ class Gameview:
                 
                 
                 
-                
+                # Process player clicks on the map tiles
                 
                 click = 1
                 click, temp = self.game.map[i+self.currenty][j+self.currentx].click(self.screen, self.currentx, self.currenty, self.TILESIZE)
@@ -281,6 +329,10 @@ class Gameview:
 
 class Popup:
     
+    '''
+    Represents a generic popup window
+    '''
+    
     def __init__(self, screen, game):
         
         self.screen = screen
@@ -313,6 +365,10 @@ class Popup:
 
 class Pauseview(Popup):
     
+    '''
+    Represents the popup shown when player pauses the game
+    '''
+    
     def __init__(self, screen, game):
         
         Popup.__init__(self, screen, game)
@@ -343,6 +399,10 @@ class Pauseview(Popup):
 
 class Gameover(Popup):
 
+    '''
+    Represents the popup shown when the game is over
+    '''
+    
     def __init__(self, screen, game):
         
         Popup.__init__(self, screen, game)

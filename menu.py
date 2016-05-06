@@ -12,6 +12,26 @@ LRED   = (255, 100, 100)
 
 class Button:
     
+    '''
+    Represents a generic clickable button in menus or GUI
+    
+    Params:
+    text: Text in button
+    x, y: Coordinates for top left of button
+    width, height: Dimensions
+    color: Color of button when not hovering over it
+    activeColor: Color of button when hovering over it
+    screen: pygame screen where button is drawn
+    font: Font for button text
+    action: Function to execute when button is clicked
+    
+    Methods:
+    draw(): Draws the button and checks if it is being hovered over
+            or if it's clicked
+    
+    '''
+    
+    
     def __init__(self, text, x, y, width, height, color, activeColor, \
                  screen, font = None, action = None):
         
@@ -55,6 +75,22 @@ class Button:
 
 class Text:
     
+    '''
+    Represents a generic piece of text shown on screen.
+    
+    Params:
+    text: Text in button
+    x, y: Coordinates for top left of button
+    size: Font size
+    screen: pygame screen where button is drawn
+    color: Color of text
+    font: font of text
+    
+    Methods:
+    draw(): Draws the text on the screen
+    '''
+    
+    
     def __init__(self, text, x, y, size, screen, color = BLACK, font = None):
         
         self.x = x
@@ -71,6 +107,11 @@ class Text:
     
     
 class Menu:
+    
+    '''
+    Represents the main menu of the game
+    '''
+    
     
     def __init__(self, screen, game, gameparams):
         
