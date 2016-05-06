@@ -142,10 +142,6 @@ class Game:
                     
                     linelist = line.split('*')
                     
-                    if int(linelist[1]) > 10:
-                        raise IndexError
-                        
-                    
                     unitcount += int(linelist[1])   
                     for i in range( int(linelist[1]) ):
                         pathToUnit = "units/" + linelist[0] + ".txt" 
@@ -252,16 +248,16 @@ class Game:
         '''
         
         if not sourceTile or not targetTile.pathable:
-            print("Target tile not pathable!")
+            #print("Target tile not pathable!")
             return
         
         if not sourceTile.unit:
-            print("No unit in source tile!")
+            #print("No unit in source tile!")
             print(sourceTile.x, sourceTile.y)
             return
         
         if sourceTile.unit.moves < 1:
-            print("Source tile unit has no moves!")
+            #print("Source tile unit has no moves!")
             print(sourceTile.unit.moves, sourceTile.x, sourceTile.y)
             return
         
@@ -307,15 +303,15 @@ class Game:
     def dealDamage(self, sourceTile, targetTile):
         
         if not sourceTile or not targetTile:
-            print("Shit parameters lol")
+            #print("Shit parameters lol")
             return False
         
         if not sourceTile.unit:
-            print("Shit sourcetile lol")
+            #print("Shit sourcetile lol")
             return False
         
         if not sourceTile.unit.moves:
-            print("No moves lol")
+            #print("No moves lol")
             return False
         
         
@@ -325,21 +321,21 @@ class Game:
             sourceTile.unit.moves -= 1
             targetTile.unit.hp -= sourceTile.unit.dmg
             
-            print("Target hp left:", targetTile.unit.hp)
+            #print("Target hp left:", targetTile.unit.hp)
         else:
-            print("Not in range")
+            #print("Not in range")
             return False
         
         
         if targetTile.unit.hp <= 0:
             
             if targetTile.unit.playerID == 1:
-                print("Player 1's {} got killed!".format(targetTile.unit.name))
+                #print("Player 1's {} got killed!".format(targetTile.unit.name))
                 self.player1.units.remove(targetTile.unit)
                 targetTile.unit = None
                 targetTile.pathable = True
             elif targetTile.unit.playerID == 2:
-                print("Player 2's {} got killed!".format(targetTile.unit.name))
+                #print("Player 2's {} got killed!".format(targetTile.unit.name))
                 self.player2.units.remove(targetTile.unit)
                 targetTile.unit = None
                 targetTile.pathable = True
@@ -467,7 +463,7 @@ class Game:
             iters += 1
             
         self.resetTiles()
-        print("Can't find path!")
+        #print("Can't find path!")
         return None
     
     

@@ -1,0 +1,9 @@
+# Comment
+
+NAME:string
+IMG:path to unit's taskbar image (.png)
+SPRITE:path to unit's sprite in game (.png)
+HP:integer
+DMG:integer
+RANGE:integer
+MOVES:integer

@@ -10,7 +10,7 @@ player1color:0 0 255
 player2color:255 0 0
 
 # Map options
-mapfile:maps/tiny.txt
+mapfile:maps/default.txt
 
 # How many different lands are there?
 landtypes:5

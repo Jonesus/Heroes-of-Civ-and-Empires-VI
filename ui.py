@@ -205,16 +205,19 @@ class Gameview:
         self.taskbar = Taskbar(self.screen, self.game)
         self.turnButton = Button("Next turn",self.screen.get_width() - 250, self.screen.get_height() - (TASKBARHEIGHT//2) - 25, 200, 50, GREEN, LGREEN, self.screen, action = self.game.switchTurn)
         
+        
+        # Maximum values for drawing tiles as limited by window resolution
         reslimitx = int( self.screen.get_width() / self.TILESIZE )
         reslimity = int( ( self.screen.get_height() - TASKBARHEIGHT ) / self.TILESIZE )
         
         self.viewx = reslimitx if reslimitx < self.game.xsize else self.game.xsize
         self.viewy = reslimity if reslimity < self.game.ysize else self.game.ysize
         
-        
+        # Map dimensions
         self.mapx = self.game.xsize
         self.mapy = self.game.ysize
         
+        # Offset from top left corner for drawing current view
         self.currentx = 0
         self.currenty = 0
         
@@ -280,6 +283,8 @@ class Gameview:
                         
                     self.taskbar.updateTexts()
                     
+        
+        # Check for game over
         
         if not self.game.player1.unitsLeft() and not self.game.gameover:
             self.gameover.winnerText.updateText("You lose!")

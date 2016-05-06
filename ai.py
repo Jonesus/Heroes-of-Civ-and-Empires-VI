@@ -42,9 +42,9 @@ class AI(Player):
         
         while self.actionsLeft() and iters:
             
-            print("\n\n-------------")
-            print("New iteration")
-            print("-------------\n\n")
+            #print("\n\n-------------")
+            #print("New iteration")
+            #print("-------------\n\n")
             
             
             for i in range(self.game.ysize):
@@ -56,8 +56,8 @@ class AI(Player):
                             unit = self.game.map[i][j].unit
                             
                             
-                            print("Unit: {}".format(unit.name))
-                            print("unit moves before: {}".format(tile.unit.moves))
+                            #print("Unit: {}".format(unit.name))
+                            #print("unit moves before: {}".format(tile.unit.moves))
                             
                             
                             if tile.unit.moves:
@@ -67,24 +67,24 @@ class AI(Player):
                                     return -1
                                 
                                 if not distance:
-                                    print("Couldn't get distance!")
+                                    #print("Couldn't get distance!")
                                     uniti+=1
                                     movesSum += tile.unit.moves
-                                    print("unit moves after: {}".format(tile.unit.moves))
-                                    print("unit {}/{} done".format(uniti, len(self.units)))
-                                    print()
+                                    #print("unit moves after: {}".format(tile.unit.moves))
+                                    #print("unit {}/{} done".format(uniti, len(self.units)))
+                                    #print()
                                     
                                     continue
                                 
                                 distance = len(distance)
-                                print("Est.dist. {}".format(distance))
+                                #print("Est.dist. {}".format(distance))
                                 
                                 if distance > 10:
-                                    print("Approaching")
+                                    #print("Approaching")
                                     self.approachEnemy(tile)
                                 
                                 else:
-                                    print("Attacking")
+                                    #print("Attacking")
                                     self.attackNearestEnemy(tile)
                                 
                                 
@@ -92,13 +92,13 @@ class AI(Player):
                                 
                             uniti+=1
                     
-                            print("unit moves after: {}".format(unit.moves))
-                            print("unit {}/{} done".format(uniti, len(self.units)))
-                            print()
+                            #print("unit moves after: {}".format(unit.moves))
+                            #print("unit {}/{} done".format(uniti, len(self.units)))
+                            #print()
             
             uniti = 0
             
-            print("total moves left: {}".format(movesSum))
+            #print("total moves left: {}".format(movesSum))
             
             if previousMoves == movesSum:
                 iters -= 1
@@ -287,11 +287,11 @@ class AI(Player):
                 return
             
             dist = unitTile.unit.moves if unitTile.unit.moves < len(path) else len(path) - 1
-            print("New leader")
+            #print("New leader")
             self.game.moveUnit(unitTile, path[dist])
             
         else:
-            print("Moving towards leader")
+            #print("Moving towards leader")
             self.moveNearUnit(unitTile, leaderTile, 0)
             
     
@@ -308,16 +308,12 @@ class AI(Player):
         
         if target:
             if not self.game.dealDamage(unitTile, target):
-                print("Moving closer")
+                #print("Moving closer")
                 self.moveNearUnit(unitTile, target)
                 
         
         
         
-    def retreat(self, unit):
-        
-        # not yet implemented
-        reason = self.findNearestEnemy(unit, 1)
         
         
         

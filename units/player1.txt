@@ -1,2 +1,4 @@
+# wadap
+# Syntax: [unit file name without .txt]*[amount of units]
 swordsman*5
 archer*3

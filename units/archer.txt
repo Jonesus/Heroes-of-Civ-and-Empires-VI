@@ -1,3 +1,5 @@
+# tämä on kommentti
+
 NAME:Archer
 IMG:graphics/portraits/archer.png
 SPRITE:graphics/sprites/archer.png
