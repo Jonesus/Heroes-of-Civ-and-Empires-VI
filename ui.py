@@ -16,7 +16,6 @@ LRED  = (255, 100, 100)
 
 # Visual constants
 TASKBARHEIGHT = 152
-TILESIZE = 32
 
 
 # Movement constants
@@ -150,16 +149,22 @@ class Taskbar:
 
 class Gameview:
     
-    def __init__(self, screen, game):
+    def __init__(self, screen, game, gameover, tilesize):
         
+        self.TILESIZE = tilesize
+        
+        self.gameover = gameover
         self.screen = screen
         self.game = game
         
         self.taskbar = Taskbar(self.screen, self.game)
         self.turnButton = Button("Next turn",self.screen.get_width() - 250, self.screen.get_height() - (TASKBARHEIGHT//2) - 25, 200, 50, GREEN, LGREEN, self.screen, action = self.game.switchTurn)
         
-        self.viewx = int( self.screen.get_width() / TILESIZE )
-        self.viewy = int( ( self.screen.get_height() - TASKBARHEIGHT ) / TILESIZE )
+        reslimitx = int( self.screen.get_width() / self.TILESIZE )
+        reslimity = int( ( self.screen.get_height() - TASKBARHEIGHT ) / self.TILESIZE )
+        
+        self.viewx = reslimitx if reslimitx < self.game.xsize else self.game.xsize
+        self.viewy = reslimity if reslimity < self.game.ysize else self.game.ysize
         
         
         self.mapx = self.game.xsize
@@ -172,7 +177,7 @@ class Gameview:
         
     def draw(self):
         
-        ret = 0
+        ret = None
         
         self.screen.fill(BLACK)
         self.taskbar.draw()
@@ -188,25 +193,25 @@ class Gameview:
         for i in range(self.viewy):
             for j in range(self.viewx):
                 
-                self.screen.blit(pygame.transform.scale( self.game.map[i+self.currenty][j+self.currentx].img, (TILESIZE,TILESIZE)), \
-                                 (j * TILESIZE, i * TILESIZE))
+                self.screen.blit(pygame.transform.scale( self.game.map[i+self.currenty][j+self.currentx].img, (self.TILESIZE,self.TILESIZE)), \
+                                 (j * self.TILESIZE, i * self.TILESIZE))
                 
                 if self.game.map[i+self.currenty][j+self.currentx].unit:
                     
-                    self.screen.blit(self.game.map[i+self.currenty][j+self.currentx].unit.sprite, \
-                                 (j * TILESIZE, i * TILESIZE))
+                    self.screen.blit(pygame.transform.scale( self.game.map[i+self.currenty][j+self.currentx].unit.sprite, (self.TILESIZE,self.TILESIZE)),\
+                                 (j * self.TILESIZE, i * self.TILESIZE))
                 
                 if self.game.selectedTile:
                     if self.game.selectedTile.x == j+self.currentx and \
                        self.game.selectedTile.y == i+self.currenty:
-                        pygame.draw.rect(self.screen, (255,255,255), (j*TILESIZE, i*TILESIZE, TILESIZE,TILESIZE), 2)
+                        pygame.draw.rect(self.screen, (255,255,255), (j*self.TILESIZE, i*self.TILESIZE, self.TILESIZE,self.TILESIZE), 2)
                 
                 
                 
                 
                 
                 click = 1
-                click, temp = self.game.map[i+self.currenty][j+self.currentx].click(self.screen, self.currentx, self.currenty, TILESIZE)
+                click, temp = self.game.map[i+self.currenty][j+self.currentx].click(self.screen, self.currentx, self.currenty, self.TILESIZE)
                 if click == 1 and temp != None:
                     self.game.selectedTile = temp
                     self.taskbar.updateTexts()
@@ -227,6 +232,17 @@ class Gameview:
                         
                     self.taskbar.updateTexts()
                     
+        
+        if not self.game.player1.unitsLeft() and not self.game.gameover:
+            self.gameover.winnerText.updateText("You lose!")
+            self.game.gameover = True
+            return 3
+        
+        if not self.game.player2.unitsLeft():
+            self.gameover.winnerText.updateText("You win!")
+            self.game.gameover = True
+            return 3
+        
         
         
         return 1          
@@ -263,8 +279,7 @@ class Gameview:
 
 
 
-
-class Pauseview:
+class Popup:
     
     def __init__(self, screen, game):
         
@@ -276,14 +291,7 @@ class Pauseview:
         self.height = self.screen.get_height() - 200
         self.width = self.screen.get_width() - 200
         
-        self.pausedText = Text("Game paused", self.screen.get_width()/2, self.y+40, 30, self.screen, BLUE,"Comic Sans MS")
-        self.continueButton = Button("Continue",self.screen.get_width()/2-100, self.height/2+50, 200, 50, GREEN, LGREEN, self.screen, action = self.continueGame)
-        self.endButton      = Button("End game",self.screen.get_width()/2-100, self.height/2+150, 200, 50, RED,   LRED,   self.screen, action = self.endGame)
-        
-        self.pausedText.x = self.pausedText.x - self.pausedText.text.get_width()/2
-        
-        self.objects = [self.pausedText, self.continueButton, self.endButton]
-
+        self.objects = []
 
 
     def draw(self):
@@ -295,6 +303,27 @@ class Pauseview:
             ret = thing.draw()
             if ret != None:
                 return ret
+    
+    
+    
+    
+
+
+
+
+class Pauseview(Popup):
+    
+    def __init__(self, screen, game):
+        
+        Popup.__init__(self, screen, game)
+        
+        self.pausedText = Text("Game paused", self.screen.get_width()/2, self.y+40, 30, self.screen, BLUE,"Comic Sans MS")
+        self.continueButton = Button("Continue",self.screen.get_width()/2-100, self.height/2+50, 200, 50, GREEN, LGREEN, self.screen, action = self.continueGame)
+        self.endButton      = Button("End game",self.screen.get_width()/2-100, self.height/2+150, 200, 50, RED,   LRED,   self.screen, action = self.endGame)
+        
+        self.pausedText.x = self.pausedText.x - self.pausedText.text.get_width()/2
+        
+        self.objects = [self.pausedText, self.continueButton, self.endButton]
 
 
     def continueGame(self):
@@ -304,6 +333,35 @@ class Pauseview:
     def endGame(self):
         return 0
 
+
+
+
+
+
+
+
+
+class Gameover(Popup):
+
+    def __init__(self, screen, game):
+        
+        Popup.__init__(self, screen, game)
+        
+        self.winnerText = Text("You win!", self.screen.get_width()/2, self.y+40, 30, self.screen, BLUE,"Comic Sans MS")
+        self.continueButton = Button("Continue",self.screen.get_width()/2-100, self.height/2+50, 200, 50, GREEN, LGREEN, self.screen, action = self.continueGame)
+        self.endButton      = Button("Go to menu",self.screen.get_width()/2-100, self.height/2+150, 200, 50, RED,   LRED,   self.screen, action = self.gotoMenu)
+        
+        self.winnerText.x = self.winnerText.x - self.winnerText.text.get_width()/2
+        
+        self.objects = [self.winnerText, self.continueButton, self.endButton]
+
+
+    def continueGame(self):
+        return 1
+    
+    
+    def gotoMenu(self):
+        return 0
 
 
 

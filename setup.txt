@@ -1,0 +1,23 @@
+# Graphics options:
+width:800
+height:600
+fps:30
+tilesize:32
+
+# Player options:
+# Colors in RGB (0-255 0-255 0-255)
+player1color:0 0 255
+player2color:255 0 0
+
+# Map options
+mapfile:maps/small.txt
+
+# How many different lands are there?
+landtypes:5
+
+# Syntax: land#:[symbol in file];[path to image] [pathable?]
+land1:.;graphics/tiles/grass.png True
+land2:,;graphics/tiles/grass.png True
+land3:G;graphics/tiles/grass.png True
+land4:M;graphics/tiles/mountain.png False
+land5:W;graphics/tiles/water.png False

@@ -8,30 +8,32 @@ class Unit:
     Represents a unit in the game.
     
     Params:
-    x:     starting x-coordinate
-    y:     starting y-coordinate
+    playerid: which player unit belongs to
     sourcefile: path to file to read unit's attributes from
     
     Attributes:
-    x:     x-coordinate
-    y:     y-coordinate
+    playerID: which player unit belongs to
     name:  unit name/type
     hp:    hitpoints, the amount of damage the unit can survive
     range: range of unit's attacks measured in tiles
     moves: amount of actions unit can take in a turn
+    tag: temporary variable for example group leader info
+    img: image of unit shown on toolbar
+    sprite: image of unit shown on playing field
     
     Methods:
-    move(direction): moves the unit one tile in the direction given as parameter
     resetMoves():    resets the unit's moves to default amount given in file
-    
     '''
-    
     
     def __init__(self, playerid, sourcefile):
         
         self.attributedict = {}
         with open(sourcefile, 'r') as file:
             for line in file:
+                
+                if line[0] == "#" or line[0] == "\n":
+                    continue
+                
                 linelist = line.split(':')
                 self.attributedict[ linelist[0] ] = linelist[1].rstrip()
         

@@ -10,20 +10,67 @@ RED  = (255,   0,   0)
 
 class Game:
     
-    def __init__(self, mapfile):
+    '''
+    Represents the current instance of the game.
+    
+    Params:
+    mapfile: path to .txt file containing the map
+    
+    Attributes:
+    map: 2D array of tiles which forms the game map
+    xsize: width of the game map in tiles
+    ysize: height of the game map in tiles
+    p#start: starting tile for player
+    player#: instance of a player class
+    
+    Methods:
+    generateMap(): reads the map file and creates a 2D array of tiles according to file
+    initializeUnits(): reads a player file which describes what kind of army each player has
+    untagUnits(): removes each unit's tag
+    distance(): distance between two tiles
+    moveUnit(): moves unit from a tile to another using greedy best-first pathfinding
+    dealDamage(): makes a unit hit another
+    swapPlayer(): changes the active and inactive player
+    switchTurn(): changes the turn
+    getNeighbours(), resetTiles(), findPath(): implementation of a greedy best-first search
+    
+    '''
+    
+    
+    
+    def __init__(self, mapfile, mapsyntax, p1color, p2color):
         
         
-        self.map, self.xsize, self.ysize = self.generateMap(mapfile)
+        self.map, self.xsize, self.ysize = self.generateMap(mapfile, mapsyntax)
+                
+        self.gameover = False
         
         self.p1start = None
         self.p2start = None
         
-        for i in range(self.ysize):
-            for j in range(self.xsize):
-                if self.map[i][j].startpos == 1:
-                    self.p1start = self.map[i][j]
-                elif self.map[i][j].startpos == 2:
-                    self.p2start = self.map[i][j]
+        self.p1color = p1color
+        self.p2color = p2color
+        
+        try:
+        
+            for i in range(self.ysize):
+                for j in range(self.xsize):
+                    if self.map[i][j].startpos == 1:
+                        self.p1start = self.map[i][j]
+                    elif self.map[i][j].startpos == 2:
+                        self.p2start = self.map[i][j]
+                    
+        except IndexError:
+            print("Invalid map file!")
+            print("Map not shaped properly.")
+            quit()
+        
+        
+        if not self.p1start or not self.p2start:
+            print("Invalid map file!")
+            print("Can't find player start positions!")
+            quit()
+        
         
         #TODO: raise corruptedmapfile
         
@@ -40,7 +87,7 @@ class Game:
     
     
         
-    def generateMap(self, mapfile):
+    def generateMap(self, mapfile, mapsyntax):
         
         gamemap = []
         
@@ -48,10 +95,13 @@ class Game:
         
         i = j = 0
         for line in file:
+            if line[0] == "#" or line[0] == "\n":
+                continue
+            
             gamemap.append([])
             line = line.rstrip()
             for char in line:
-                gamemap[i].append( Tile(j, i, char) )
+                gamemap[i].append( Tile(j, i, char, mapsyntax) )
                 j += 1
             xsize = j
             j = 0
@@ -71,6 +121,10 @@ class Game:
             unitcount = 0
             
             for line in file:
+                
+                if line[0] == "#" or line[0] == "\n":
+                    continue
+                
                 linelist = line.split('*')
                 
                 if int(linelist[1]) > 10:
@@ -106,9 +160,9 @@ class Game:
             unitrange += 1    
         
         if player.ID == 1:
-            player.colorizeUnits(BLUE)
+            player.colorizeUnits(self.p1color)
         elif player.ID == 2:
-            player.colorizeUnits(RED)
+            player.colorizeUnits(self.p2color)
     
     
         self.untagUnits(player)
@@ -169,6 +223,7 @@ class Game:
             #print("Tile coords after: {} {}".format(path[dist].x, path[dist].y))
             
             sourceTile.pathable = True
+            path[dist].pathable = False
             self.selectedTile = path[dist]
         
         elif path != None and sourceTile.unit.moves > 0:
@@ -184,6 +239,7 @@ class Game:
             #print("Tile coords after: {} {}".format(path[tempmoves].x, path[tempmoves].y))
             
             sourceTile.pathable = True
+            path[tempmoves].pathable = False
             self.selectedTile = path[tempmoves]
         
         
@@ -258,13 +314,13 @@ class Game:
         
         if ret == -1:
             print("Game over lol")
-            return -1
+            return 3
             
         self.swapPlayers()
         self.activePlayer.resetUnits()
         print("Player 1 active\n\n")
     
-    
+        return None
     
         
     

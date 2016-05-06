@@ -1,13 +1,13 @@
 import pygame
 import time
 
-BLACK = (  0,   0,   0)
-WHITE = (255, 255, 255)
-BLUE =  (  0,   0, 255)
-GREEN = (  0, 255,   0)
-LGREEN= (100, 255, 100)
-RED =   (255,   0,   0)
-LRED =  (255, 100, 100)
+BLACK  = (  0,   0,   0)
+WHITE  = (255, 255, 255)
+BLUE   = (  0,   0, 255)
+GREEN  = (  0, 255,   0)
+LGREEN = (100, 255, 100)
+RED    = (255,   0,   0)
+LRED   = (255, 100, 100)
 
 
 class Button:
@@ -72,8 +72,9 @@ class Text:
     
 class Menu:
     
-    def __init__(self, screen, game):
+    def __init__(self, screen, game, gameparams):
         
+        self.gameparams = gameparams
         self.game = game
         self.screen = screen
         
@@ -99,7 +100,7 @@ class Menu:
     
     
     def startGame(self):
-        self.game.__init__("maps/default.txt")
+        self.game.__init__(self.gameparams[0], self.gameparams[1], self.gameparams[2], self.gameparams[3])
         return 1
 
     
